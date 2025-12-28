@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Questionário - Fundamentos Azure</title>
+    <title>Quiz - Fundamentos de Nuvem Azure</title>
     <style>
-        /* Mantenho o mesmo CSS que você já tem */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,96 +13,108 @@
         }
         
         body {
-            background-color: #f5f8fa;
+            background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
             padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #0078d4 0%, #005ba1 100%);
-            color: white;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
         }
         
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-        
-        .questions-panel {
-            flex: 1;
-            min-width: 300px;
+            max-width: 900px;
+            margin: 0 auto;
             background-color: white;
             border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
-        .question-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #0078d4;
-            transition: transform 0.3s;
-        }
-        
-        .question-card:hover {
-            transform: translateY(-3px);
-        }
-        
-        .question-card.active {
-            border-left-color: #ff8c00;
-            background-color: #f9f9f9;
-        }
-        
-        .question-number {
-            display: inline-block;
+        header {
             background-color: #0078d4;
             color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .progress-container {
+            background-color: #e6e6e6;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+            flex-grow: 1;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #0078d4;
+            width: 2%;
+            transition: width 0.5s ease;
+        }
+        
+        .question-counter {
+            font-weight: bold;
+            color: #0078d4;
+            white-space: nowrap;
+        }
+        
+        .question-container {
+            padding: 30px 25px;
+        }
+        
+        .category {
+            display: inline-block;
+            background-color: #e6f2ff;
+            color: #0078d4;
             padding: 5px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 15px;
         }
         
         .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #222;
-            font-weight: 500;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
         }
         
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .question-type {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+        
+        .options-container {
+            margin-bottom: 25px;
         }
         
         .option {
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
+            background-color: #f9f9f9;
+            border: 2px solid #e6e6e6;
             border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -111,8 +122,8 @@
         }
         
         .option:hover {
-            background-color: #f0f7ff;
-            border-color: #b3d8ff;
+            background-color: #f0f0f0;
+            border-color: #cccccc;
         }
         
         .option.selected {
@@ -126,756 +137,1741 @@
         }
         
         .option.incorrect {
-            background-color: #fdeaea;
+            background-color: #fde8e8;
             border-color: #dc3545;
         }
         
-        .option-marker {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid #aaa;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
+        .option input[type="checkbox"], 
+        .option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
         }
         
-        .option.selected .option-marker {
-            background-color: #0078d4;
-            border-color: #0078d4;
-            color: white;
+        .option-label {
+            flex-grow: 1;
         }
         
-        .option.correct .option-marker {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
-        
-        .option.incorrect .option-marker {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
-        
-        .feedback {
-            margin-top: 20px;
-            padding: 15px;
+        .explanation-container {
+            background-color: #f8f9fa;
             border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
             display: none;
         }
         
-        .feedback.correct {
-            background-color: #e7f7e7;
-            border-left: 5px solid #28a745;
-            display: block;
+        .explanation-title {
+            font-weight: 600;
+            color: #0078d4;
+            margin-bottom: 10px;
         }
         
-        .feedback.incorrect {
-            background-color: #fdeaea;
-            border-left: 5px solid #dc3545;
-            display: block;
+        .explanation-text {
+            color: #555;
         }
         
-        .feedback-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .feedback-title i {
-            margin-right: 8px;
-        }
-        
-        .controls {
+        .buttons-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            padding: 20px 25px;
+            border-top: 1px solid #e6e6e6;
         }
         
-        .btn {
+        button {
             padding: 12px 25px;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
             transition: all 0.3s;
+            font-size: 16px;
         }
         
-        .btn-primary {
+        #prev-btn {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        #prev-btn:hover:not(:disabled) {
+            background-color: #e9ecef;
+        }
+        
+        #next-btn, #submit-btn, #restart-btn, #review-btn, #submit-review-btn, #finish-review-btn {
             background-color: #0078d4;
             color: white;
         }
         
-        .btn-primary:hover {
-            background-color: #005ba1;
+        #next-btn:hover, #submit-btn:hover, #restart-btn:hover, #review-btn:hover, #submit-review-btn:hover, #finish-review-btn:hover {
+            background-color: #005a9e;
         }
         
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-        
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #1e7e34;
-        }
-        
-        .btn:disabled {
+        #prev-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
         
-        .results-panel {
-            flex: 1;
-            min-width: 300px;
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .results-header {
+        .results-container {
+            padding: 40px 25px;
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
+            display: none;
         }
         
-        .results-header h2 {
+        .results-title {
+            font-size: 28px;
             color: #0078d4;
-            font-size: 1.8rem;
+            margin-bottom: 20px;
         }
         
-        .score-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .score-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: conic-gradient(#0078d4 0% 0%, #e0e0e0 0% 100%);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .score-inner {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        .score-value {
-            font-size: 2.5rem;
+        .score {
+            font-size: 72px;
             font-weight: bold;
-            color: #222;
+            color: #28a745;
+            margin: 20px 0;
         }
         
-        .score-label {
-            font-size: 1rem;
-            color: #666;
+        .score-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
         }
         
         .results-details {
-            flex-grow: 1;
-            overflow-y: auto;
-            max-height: 400px;
+            text-align: left;
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
         }
         
-        .question-list {
-            list-style: none;
-            margin-top: 20px;
+        .results-details h3 {
+            color: #0078d4;
+            margin-bottom: 15px;
         }
         
-        .question-list li {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
-        .question-list li:hover {
-            background-color: #f5f8fa;
+        .summary-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
         }
         
-        .question-list li.active {
+        .summary-value {
+            font-size: 24px;
             font-weight: bold;
             color: #0078d4;
-            background-color: #f0f7ff;
         }
         
-        .question-status {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .question-status.answered {
-            background-color: #0078d4;
-            color: white;
-        }
-        
-        .question-status.unanswered {
-            background-color: #e0e0e0;
+        .summary-label {
+            font-size: 14px;
             color: #666;
+            margin-top: 5px;
         }
         
-        .footer {
+        .review-container {
+            padding: 40px 25px;
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            color: #666;
-            font-size: 0.9rem;
-            border-top: 1px solid #ddd;
+            display: none;
+        }
+        
+        .review-title {
+            font-size: 28px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        .review-stats {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        .review-question-counter {
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .review-note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+            color: #856404;
+        }
+        
+        .review-results-container {
+            padding: 40px 25px;
+            text-align: center;
+            display: none;
+        }
+        
+        .review-results-title {
+            font-size: 28px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .review-score {
+            font-size: 72px;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 20px 0;
+        }
+        
+        .improvement {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
         }
         
         @media (max-width: 768px) {
-            .container {
+            .progress-container {
                 flex-direction: column;
+                align-items: flex-start;
             }
             
-            .header h1 {
-                font-size: 1.8rem;
+            .progress-bar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
             }
             
-            .controls {
+            .buttons-container {
                 flex-direction: column;
                 gap: 10px;
             }
             
-            .controls div {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
+            button {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Simulador de Questionário - Fundamentos Azure</h1>
-        <p>Teste seus conhecimentos sobre os conceitos fundamentais do Microsoft Azure</p>
-    </div>
-    
     <div class="container">
-        <div class="questions-panel">
-            <div id="question-container">
-                <!-- As questões serão carregadas aqui dinamicamente -->
+        <header>
+            <h1>Quiz - Fundamentos de Nuvem Azure</h1>
+            <p>Teste seus conhecimentos sobre conceitos de computação em nuvem e Microsoft Azure</p>
+        </header>
+        
+        <!-- Área do Quiz Principal -->
+        <div class="progress-container" id="main-progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="question-counter" id="question-counter">Pergunta 1 de 50</div>
+        </div>
+        
+        <div class="question-container" id="question-container">
+            <div class="category" id="category">Fundamentos</div>
+            <div class="question-type" id="question-type">Tipo: Escolha única</div>
+            <div class="question-text" id="question-text">Carregando pergunta...</div>
+            
+            <div class="options-container" id="options-container">
+                <!-- Opções serão inseridas aqui dinamicamente -->
             </div>
             
-            <div class="controls">
-                <button id="prev-btn" class="btn btn-secondary">Anterior</button>
-                <div>
-                    <button id="check-btn" class="btn btn-primary">Verificar Resposta</button>
-                    <button id="next-btn" class="btn btn-primary">Próxima</button>
-                </div>
-                <button id="finish-btn" class="btn btn-success">Finalizar Teste</button>
+            <div class="explanation-container" id="explanation-container">
+                <div class="explanation-title">Explicação:</div>
+                <div class="explanation-text" id="explanation-text"></div>
             </div>
         </div>
         
-        <div class="results-panel">
-            <div class="results-header">
-                <h2>Seu Progresso</h2>
-            </div>
+        <div class="buttons-container" id="main-buttons-container">
+            <button id="prev-btn" disabled>Anterior</button>
+            <button id="next-btn">Próxima</button>
+            <button id="submit-btn" style="display: none;">Ver Resultado</button>
+            <button id="restart-btn" style="display: none;">Refazer Quiz</button>
+            <button id="review-btn" style="display: none;">Revisar Erradas</button>
+        </div>
+        
+        <!-- Resultados do Quiz Principal -->
+        <div class="results-container" id="results-container">
+            <h2 class="results-title">Quiz Concluído!</h2>
+            <div class="score" id="score">0%</div>
+            <p class="score-text" id="score-text">Você acertou <span id="correct-answers">0</span> de <span id="total-questions">50</span> perguntas</p>
             
-            <div class="score-display">
-                <div class="score-circle" id="score-circle">
-                    <div class="score-inner">
-                        <div class="score-value">0%</div>
-                        <div class="score-label">Progresso</div>
-                    </div>
+            <div class="results-summary">
+                <div class="summary-item">
+                    <div class="summary-value" id="correct-count">0</div>
+                    <div class="summary-label">Corretas</div>
                 </div>
-                <p id="score-text">Responda as questões para ver sua pontuação</p>
+                <div class="summary-item">
+                    <div class="summary-value" id="incorrect-count">0</div>
+                    <div class="summary-label">Incorretas</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="percentage">0%</div>
+                    <div class="summary-label">Aproveitamento</div>
+                </div>
             </div>
             
-            <div class="results-details">
-                <h3>Lista de Questões</h3>
-                <ul class="question-list" id="question-list">
-                    <!-- Lista de questões será gerada aqui -->
-                </ul>
+            <div id="review-section" style="margin-top: 30px;">
+                <h3 style="color: #dc3545; margin-bottom: 15px;">Revisão de Perguntas Erradas</h3>
+                <p id="review-message" style="margin-bottom: 20px;">Você errou <span id="wrong-count">0</span> perguntas.</p>
+                <p style="margin-bottom: 20px; color: #555;">Você pode responder novamente às perguntas que errou para testar seu aprendizado.</p>
+                <button id="start-review-btn" style="background-color: #dc3545; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-bottom: 15px;">
+                    Responder Perguntas Erradas Novamente
+                </button>
+                <div style="margin-top: 15px;">
+                    <button id="restart-btn-2" class="restart-btn">Refazer Quiz Completo</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Área da Revisão Interativa -->
+        <div class="review-container" id="review-container">
+            <h2 class="review-title">Revisão Interativa</h2>
+            <div class="review-note">
+                <strong>Importante:</strong> Você está respondendo novamente as perguntas que errou no quiz original. 
+                Tente acertar desta vez! Após responder, você verá se acertou ou não.
+            </div>
+            
+            <!-- Progresso da Revisão -->
+            <div class="progress-container" id="review-progress-container" style="margin-bottom: 20px;">
+                <div class="progress-bar">
+                    <div class="progress" id="review-progress"></div>
+                </div>
+                <div class="question-counter" id="review-question-counter">Pergunta 1 de 0</div>
+            </div>
+            
+            <div class="review-stats" id="review-stats">Respondendo 0 perguntas</div>
+            
+            <!-- Pergunta da Revisão -->
+            <div class="question-container">
+                <div class="category" id="review-category">Fundamentos</div>
+                <div class="question-type" id="review-question-type">Tipo: Escolha única</div>
+                <div class="question-text" id="review-question-text">Carregando pergunta...</div>
+                
+                <div class="options-container" id="review-options-container">
+                    <!-- Opções serão inseridas aqui dinamicamente -->
+                </div>
+                
+                <div class="explanation-container" id="review-explanation-container" style="display: none;">
+                    <div class="explanation-title">Explicação:</div>
+                    <div class="explanation-text" id="review-explanation-text"></div>
+                </div>
+            </div>
+            
+            <!-- Botões da Revisão -->
+            <div class="buttons-container">
+                <button id="review-prev-btn" disabled>Anterior</button>
+                <button id="review-next-btn">Próxima</button>
+                <button id="submit-review-btn" style="display: none;">Ver Resultado da Revisão</button>
+            </div>
+        </div>
+        
+        <!-- Resultados da Revisão -->
+        <div class="review-results-container" id="review-results-container">
+            <h2 class="review-results-title">Revisão Concluída!</h2>
+            <div class="review-score" id="review-score">0%</div>
+            <p class="score-text" id="review-score-text">Na revisão, você acertou <span id="review-correct-answers">0</span> de <span id="review-total-questions">0</span> perguntas</p>
+            
+            <div class="improvement" id="improvement-text">
+                <!-- Texto sobre melhoria será inserido aqui -->
+            </div>
+            
+            <div class="results-summary">
+                <div class="summary-item">
+                    <div class="summary-value" id="review-correct-count">0</div>
+                    <div class="summary-label">Acertos na Revisão</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="review-incorrect-count">0</div>
+                    <div class="summary-label">Erros na Revisão</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="review-improvement">0%</div>
+                    <div class="summary-label">Melhoria</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button id="back-to-main-results-btn" style="background-color: #0078d4; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-right: 10px;">
+                    Voltar aos Resultados
+                </button>
+                <button id="restart-review-btn" style="background-color: #dc3545; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-right: 10px;">
+                    Refazer Revisão
+                </button>
+                <button id="restart-full-quiz-btn" style="background-color: #28a745; color: white; padding: 12px 25px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer;">
+                    Refazer Quiz Completo
+                </button>
             </div>
         </div>
     </div>
-    
-    <div class="footer">
-        <p>Baseado nas questões de certificação Azure Fundamentals. Este é um simulador para fins educacionais.</p>
-    </div>
 
     <script>
-        // Banco de questões do questionário
-        const questions = [
+        // Dados do quiz - TODAS as 50 perguntas
+        const quizData = [
             {
                 id: 1,
-                text: "Quais dois serviços você pode usar para estabelecer conectividade de rede entre uma rede local e recursos do Azure? Cada resposta correta apresenta uma solução completa.",
+                question: "Quais são dois serviços básicos fornecidos por todos os provedores de nuvem? Cada resposta correta apresenta uma solução completa.",
                 type: "multiple",
+                category: "Fundamentos",
                 options: [
-                    { id: "a", text: "Azure Bastion", correct: false },
-                    { id: "b", text: "Firewall do Azure", correct: false },
-                    { id: "c", text: "Azure VPN Gateway", correct: true },
-                    { id: "d", text: "ExpressRoute", correct: true }
+                    { text: "computação", correct: true },
+                    { text: "armazenamento", correct: true },
+                    { text: "colocação", correct: false },
+                    { text: "desenvolvimento de aplicativos", correct: false }
                 ],
-                explanation: "As conexões do ExpressRoute e o Gateway de VPN do Azure são dois serviços que você pode usar para conectar uma rede local ao Azure. O Bastion fornece uma interface da Web para administrar remotamente máquinas virtuais do Azure usando SSH/RDP. O Firewall do Azure é um serviço de firewall com estado usado para proteger redes virtuais."
+                explanation: "Todos os provedores de nuvem fornecem serviços de computação e armazenamento. A colocação é quando uma empresa aluga espaço em um datacenter físico compartilhado. O desenvolvimento de aplicativos é responsabilidade do cliente."
             },
             {
                 id: 2,
-                text: "Selecione a resposta que conclui corretamente a frase. Na computação em nuvem, [escolha da resposta] permite implantar aplicativos em datacenters regionais em todo o mundo.",
-                type: "single",
+                question: "Quais são as duas características que são vantagens comuns da computação em nuvem? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Fundamentos",
                 options: [
-                    { id: "a", text: "recuperação de desastre", correct: false },
-                    { id: "b", text: "localização geográfica", correct: true },
-                    { id: "c", text: "escalabilidade vertical", correct: false },
-                    { id: "d", text: "virtualização", correct: false }
+                    { text: "distribuição geográfica", correct: true },
+                    { text: "alta disponibilidade", correct: true },
+                    { text: "acesso físico aos servidores", correct: false },
+                    { text: "virtualização", correct: false }
                 ],
-                explanation: "Você pode implantar aplicativos e dados em datacenters regionais em todo o mundo, garantindo assim que seus clientes sempre tenham o melhor desempenho em sua região. Isso é conhecido como distribuição geográfica."
+                explanation: "Distribuição geográfica e alta disponibilidade são vantagens da nuvem."
             },
             {
                 id: 3,
-                text: "[Escolha da resposta] é o contêiner lógico usado para combinar e organizar recursos do Azure.",
+                question: "Qual é a vantagem da computação em nuvem em comparação com implantações locais?",
                 type: "single",
+                category: "Fundamentos",
                 options: [
-                    { id: "a", text: "ARM (Azure Resource Manager)", correct: false },
-                    { id: "b", text: "um grupo de recursos", correct: true },
-                    { id: "c", text: "uma assinatura do Azure", correct: false },
-                    { id: "d", text: "uma zona de disponibilidade", correct: false }
+                    { text: "Você pode dimensionar mais rapidamente.", correct: true },
+                    { text: "Você possui suas próprias CPUs.", correct: false },
+                    { text: "Você tem acesso total no caso de uma interrupção da Internet.", correct: false },
+                    { text: "Você trabalha em várias estações de trabalho.", correct: false }
                 ],
-                explanation: "Os recursos são combinados em grupos de recursos, que atuam como um contêiner lógico no qual recursos do Azure, como aplicativos Web, bancos de dados e contas de armazenamento, são implantados e gerenciados."
+                explanation: "A computação em nuvem permite dimensionar mais rapidamente."
             },
             {
                 id: 4,
-                text: "Quais dois fatores afetam os custos do Azure? Cada resposta correta apresenta uma solução completa.",
-                type: "multiple",
+                question: "Aumentar a capacidade de computação de um aplicativo adicionando RAM ou CPUs a uma máquina virtual é chamado:",
+                type: "single",
+                category: "Computação",
                 options: [
-                    { id: "a", text: "seleção de zona de disponibilidade", correct: false },
-                    { id: "b", text: "local do recurso", correct: true },
-                    { id: "c", text: "uso de recursos", correct: true },
-                    { id: "d", text: "tipo de autenticação", correct: false }
+                    { text: "dimensionamento vertical", correct: true },
+                    { text: "dimensionamento horizontal", correct: false },
+                    { text: "recuperação de desastre", correct: false },
+                    { text: "alta disponibilidade", correct: false }
                 ],
-                explanation: "Os custos do Azure são afetados principalmente pelo local onde o recurso é implantado (diferentes regiões têm preços diferentes) e pelo uso dos recursos (modelo de pagamento conforme o uso)."
+                explanation: "Adicionar RAM ou CPU é dimensionamento vertical."
             },
             {
                 id: 5,
-                text: "Qual serviço do Azure avalia os recursos do Azure e faz recomendações para ajudar a melhorar a confiabilidade, a segurança, o desempenho e a redução de custos?",
+                question: "Implantar e configurar recursos baseados em nuvem rapidamente à medida que os requisitos de negócios mudam é chamado:",
                 type: "single",
+                category: "Fundamentos",
                 options: [
-                    { id: "a", text: "Integridade do Serviço do Azure", correct: false },
-                    { id: "b", text: "Assistente do Azure", correct: true },
-                    { id: "c", text: "Azure Policy", correct: false },
-                    { id: "d", text: "Azure Monitor", correct: false }
+                    { text: "agilidade", correct: true },
+                    { text: "escalabilidade", correct: false },
+                    { text: "elasticidade", correct: false },
+                    { text: "alta disponibilidade", correct: false }
                 ],
-                explanation: "O Assistente do Azure avalia os recursos do Azure e faz recomendações para ajudar a melhorar a confiabilidade, a segurança e o desempenho, alcançar a excelência operacional e reduzir os custos."
+                explanation: "Isso se chama agilidade."
             },
             {
                 id: 6,
-                text: "O que você pode usar para encontrar informações sobre a manutenção planejada para os serviços do Azure que são essenciais para sua organização?",
+                question: "Aumentar a capacidade de computação de um aplicativo adicionando instâncias de recursos, como máquinas virtuais, é chamado:",
                 type: "single",
+                category: "Computação",
                 options: [
-                    { id: "a", text: "Assistente do Azure", correct: false },
-                    { id: "b", text: "Integridade do Serviço do Azure", correct: true },
-                    { id: "c", text: "Azure Monitor", correct: false },
-                    { id: "d", text: "Azure Resource Graph", correct: false }
+                    { text: "dimensionamento horizontal", correct: true },
+                    { text: "dimensionamento vertical", correct: false },
+                    { text: "recuperação de desastre", correct: false },
+                    { text: "alta disponibilidade", correct: false }
                 ],
-                explanation: "Você pode fazer uma busca detalhada sobre os serviços, regiões e detalhes afetados para mostrar como um evento afetará você e o que você deve fazer. A maioria desses eventos ocorre sem nenhum impacto para você e não será mostrada. Em um caso raro em que uma reinicialização é necessária, a Integridade do Serviço permite que você escolha quando executar a manutenção para minimizar o tempo de inatividade."
+                explanation: "Adicionar mais instâncias é dimensionamento horizontal."
+            },
+            {
+                id: 7,
+                question: "O que é a alta disponibilidade em um ambiente de nuvem pública dependente?",
+                type: "single",
+                category: "Fundamentos",
+                options: [
+                    { text: "o SLA (contrato de nível de serviço) escolhido", correct: true },
+                    { text: "o número de datacenters", correct: false },
+                    { text: "a velocidade da internet", correct: false },
+                    { text: "o tipo de armazenamento", correct: false }
+                ],
+                explanation: "A alta disponibilidade depende do SLA escolhido."
+            },
+            {
+                id: 8,
+                question: "Na computação em nuvem, _____ permite implantar aplicativos em datacenters regionais em todo o mundo.",
+                type: "single",
+                category: "Fundamentos",
+                options: [
+                    { text: "recuperação de desastre", correct: false },
+                    { text: "localização geográfica", correct: true },
+                    { text: "escalabilidade vertical", correct: false },
+                    { text: "virtualização", correct: false }
+                ],
+                explanation: "Isso se chama localização geográfica."
+            },
+            {
+                id: 9,
+                question: "Em quais dois modelos de implantação os clientes são responsáveis por gerenciar sistemas operacionais que hospedam aplicativos? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Fundamentos",
+                options: [
+                    { text: "infraestrutura como serviço (IaaS)", correct: true },
+                    { text: "local", correct: true },
+                    { text: "plataforma como serviço (PaaS)", correct: false },
+                    { text: "software como serviço (SaaS)", correct: false }
+                ],
+                explanation: "IaaS e implantações locais exigem gerenciamento do SO."
+            },
+            {
+                id: 10,
+                question: "Qual tipo de modelo de serviço de nuvem normalmente é licenciado por meio de uma assinatura mensal ou anual?",
+                type: "single",
+                category: "Fundamentos",
+                options: [
+                    { text: "software como serviço (SaaS)", correct: true },
+                    { text: "plataforma como serviço (PaaS)", correct: false },
+                    { text: "infraestrutura como serviço (IaaS)", correct: false },
+                    { text: "função como serviço (FaaS)", correct: false }
+                ],
+                explanation: "SaaS normalmente usa assinatura mensal/anual."
+            },
+            {
+                id: 11,
+                question: "Sua organização está criando um aplicativo personalizado. Você precisa se concentrar no desenvolvimento de aplicativos em vez de configuração e gerenciamento de servidores. Qual modelo de serviço de nuvem você deve usar?",
+                type: "single",
+                category: "Serviços de Nuvem",
+                options: [
+                    { text: "plataforma como serviço (PaaS)", correct: true },
+                    { text: "software como serviço (SaaS)", correct: false },
+                    { text: "infraestrutura como serviço (IaaS)", correct: false },
+                    { text: "função como serviço (FaaS)", correct: false }
+                ],
+                explanation: "Com o PaaS, você pode se concentrar no desenvolvimento enquanto o provedor gerencia a plataforma."
+            },
+            {
+                id: 12,
+                question: "Qual modelo de serviço de nuvem é usado pelo Microsoft Office 365?",
+                type: "single",
+                category: "Serviços de Nuvem",
+                options: [
+                    { text: "software como serviço (SaaS)", correct: true },
+                    { text: "plataforma como serviço (PaaS)", correct: false },
+                    { text: "infraestrutura como serviço (IaaS)", correct: false },
+                    { text: "desktop como serviço (DaaS)", correct: false }
+                ],
+                explanation: "Office 365 é um exemplo clássico de SaaS."
+            },
+            {
+                id: 13,
+                question: "O que usa o modelo de serviço de nuvem IaaS (infraestrutura como serviço)?",
+                type: "single",
+                category: "Serviços de Nuvem",
+                options: [
+                    { text: "Máquinas virtuais do Azure", correct: true },
+                    { text: "Serviços de Aplicativo do Azure", correct: false },
+                    { text: "Azure Cosmos DB", correct: false },
+                    { text: "Microsoft Office 365", correct: false }
+                ],
+                explanation: "Máquinas Virtuais do Azure são IaaS."
+            },
+            {
+                id: 14,
+                question: "Qual tipo de serviço de nuvem são redes virtuais?",
+                type: "single",
+                category: "Serviços de Nuvem",
+                options: [
+                    { text: "infraestrutura como serviço (IaaS)", correct: true },
+                    { text: "plataforma como serviço (PaaS)", correct: false },
+                    { text: "software como serviço (SaaS)", correct: false },
+                    { text: "função como serviço (FaaS)", correct: false }
+                ],
+                explanation: "Redes virtuais fazem parte da IaaS."
+            },
+            {
+                id: 15,
+                question: "_____ é o contêiner lógico usado para combinar e organizar recursos do Azure.",
+                type: "single",
+                category: "Arquitetura Azure",
+                options: [
+                    { text: "ARM (Azure Resource Manager)", correct: false },
+                    { text: "um grupo de recursos", correct: true },
+                    { text: "uma assinatura do Azure", correct: false },
+                    { text: "uma zona de disponibilidade", correct: false }
+                ],
+                explanation: "Recursos são organizados em grupos de recursos."
+            },
+            {
+                id: 16,
+                question: "Em um par de regiões, uma região é emparelhada com outra região na mesma _____.",
+                type: "single",
+                category: "Arquitetura Azure",
+                options: [
+                    { text: "geografia", correct: true },
+                    { text: "zona de disponibilidade", correct: false },
+                    { text: "datacenter", correct: false },
+                    { text: "assinatura", correct: false }
+                ],
+                explanation: "Pares de regiões estão na mesma geografia."
+            },
+            {
+                id: 17,
+                question: "Quais dois componentes são criados em uma assinatura do Azure? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Arquitetura Azure",
+                options: [
+                    { text: "grupos de recursos", correct: true },
+                    { text: "recursos", correct: true },
+                    { text: "grupos de gerenciamento", correct: false },
+                    { text: "contas", correct: false }
+                ],
+                explanation: "Assinaturas contêm grupos de recursos e recursos."
+            },
+            {
+                id: 18,
+                question: "O que é uma conta de Armazenamento do Azure chamada storage001 como exemplo?",
+                type: "single",
+                category: "Arquitetura Azure",
+                options: [
+                    { text: "um recurso", correct: true },
+                    { text: "um grupo de recursos", correct: false },
+                    { text: "uma assinatura", correct: false },
+                    { text: "um grupo de gerenciamento", correct: false }
+                ],
+                explanation: "É um recurso do Azure."
+            },
+            {
+                id: 19,
+                question: "Qual componente do Azure permite replicar recursos em uma geografia para garantir a continuidade dos negócios durante um desastre natural no site primário?",
+                type: "single",
+                category: "Arquitetura Azure",
+                options: [
+                    { text: "pares de região", correct: true },
+                    { text: "zonas de disponibilidade", correct: false },
+                    { text: "grupos de gerenciamento", correct: false },
+                    { text: "assinaturas", correct: false }
+                ],
+                explanation: "Pares de região permitem replicação para continuidade."
+            },
+            {
+                id: 20,
+                question: "Qual serviço de computação do Azure você pode usar para implantar e gerenciar um conjunto de máquinas virtuais idênticas?",
+                type: "single",
+                category: "Computação",
+                options: [
+                    { text: "Conjuntos de escalas de máquinas virtuais do Azure", correct: true },
+                    { text: "Azure Functions", correct: false },
+                    { text: "Azure App Service", correct: false },
+                    { text: "Azure Container Instances", correct: false }
+                ],
+                explanation: "Conjuntos de Dimensionamento gerenciam VMs idênticas."
+            },
+            {
+                id: 21,
+                question: "O que você pode usar para executar código em um ambiente sem servidor?",
+                type: "single",
+                category: "Computação",
+                options: [
+                    { text: "Azure Functions", correct: true },
+                    { text: "Azure Virtual Machines", correct: false },
+                    { text: "Azure App Service", correct: false },
+                    { text: "Azure Kubernetes Service", correct: false }
+                ],
+                explanation: "Azure Functions é serverless."
+            },
+            {
+                id: 22,
+                question: "Você precisa permitir que recursos em duas redes virtuais diferentes do Azure se comuniquem entre si. O que você deve configurar?",
+                type: "single",
+                category: "Rede",
+                options: [
+                    { text: "emparelhamento", correct: true },
+                    { text: "VPN Gateway", correct: false },
+                    { text: "ExpressRoute", correct: false },
+                    { text: "Firewall do Azure", correct: false }
+                ],
+                explanation: "Emparelhamento conecta redes virtuais."
+            },
+            {
+                id: 23,
+                question: "Quais dois serviços você pode usar para estabelecer conectividade de rede entre uma rede local e recursos do Azure? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Rede",
+                options: [
+                    { text: "Firewall do Azure", correct: false },
+                    { text: "Azure VPN Gateway", correct: true },
+                    { text: "ExpressRoute", correct: true },
+                    { text: "Azure Bastion", correct: false }
+                ],
+                explanation: "VPN Gateway e ExpressRoute conectam redes locais ao Azure."
+            },
+            {
+                id: 24,
+                question: "O que você pode usar para fornecer aos usuários Mac e Android acesso a um ambiente do Windows que executará aplicativos baseados no Windows?",
+                type: "single",
+                category: "Computação",
+                options: [
+                    { text: "Área de Trabalho Virtual do Azure", correct: true },
+                    { text: "Azure Virtual Machines", correct: false },
+                    { text: "Remote Desktop Services", correct: false },
+                    { text: "Azure App Service", correct: false }
+                ],
+                explanation: "Azure Virtual Desktop fornece acesso multiplataforma."
+            },
+            {
+                id: 25,
+                question: "Quais são dois serviços que permitem executar aplicativos em contêineres? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Computação",
+                options: [
+                    { text: "Instâncias de Contêiner do Azure", correct: true },
+                    { text: "AKS (Serviço de Kubernetes do Azure)", correct: true },
+                    { text: "Azure Virtual Machines", correct: false },
+                    { text: "Azure App Service", correct: false }
+                ],
+                explanation: "Ambos executam contêineres."
+            },
+            {
+                id: 26,
+                question: "Quais são os dois cenários de uso comuns para o Armazenamento de Blobs do Azure? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Armazenamento",
+                options: [
+                    { text: "servindo imagens ou documentos diretamente para um navegador", correct: true },
+                    { text: "armazenando dados para backup e restauração", correct: true },
+                    { text: "hospedando bancos de dados relacionais", correct: false },
+                    { text: "executando aplicativos web", correct: false }
+                ],
+                explanation: "Blobs são bons para arquivos estáticos e backups."
+            },
+            {
+                id: 27,
+                question: "Qual camada de serviço de Armazenamento de Blobs do Azure tem os maiores custos de armazenamento e os tempos de acesso mais rápidos para ler e gravar dados?",
+                type: "single",
+                category: "Armazenamento",
+                options: [
+                    { text: "Frequente (Hot)", correct: true },
+                    { text: "Esporádica (Cool)", correct: false },
+                    { text: "Arquivo (Archive)", correct: false },
+                    { text: "Premium", correct: false }
+                ],
+                explanation: "Camada Hot tem acesso mais rápido."
+            },
+            {
+                id: 28,
+                question: "Qual é a finalidade da defesa em profundidade?",
+                type: "single",
+                category: "Segurança",
+                options: [
+                    { text: "para usar várias camadas de proteção para impedir que as informações sejam acessadas por usuários não autorizados", correct: true },
+                    { text: "para garantir alta disponibilidade", correct: false },
+                    { text: "para reduzir custos de armazenamento", correct: false },
+                    { text: "para melhorar o desempenho da rede", correct: false }
+                ],
+                explanation: "Defesa em profundidade usa múltiplas camadas de segurança."
+            },
+            {
+                id: 29,
+                question: "A qual objeto ou nível uma função RBAC (controle de acesso baseado em função) do Azure é aplicada?",
+                type: "single",
+                category: "Segurança",
+                options: [
+                    { text: "escopo", correct: true },
+                    { text: "recurso", correct: false },
+                    { text: "assinatura", correct: false },
+                    { text: "grupo de gerenciamento", correct: false }
+                ],
+                explanation: "Funções RBAC são aplicadas a escopos."
+            },
+            {
+                id: 30,
+                question: "Qual recurso do Microsoft Entra você pode usar para configurar a autenticação de segurança que exige que os usuários usem seu celular para entrar?",
+                type: "single",
+                category: "Segurança",
+                options: [
+                    { text: "MFA (autenticação multifator)", correct: true },
+                    { text: "SSO (logon único)", correct: false },
+                    { text: "Acesso Condicional", correct: false },
+                    { text: "Identity Protection", correct: false }
+                ],
+                explanation: "MFA requer múltiplos fatores de autenticação."
+            },
+            {
+                id: 31,
+                question: "Quais são os dois serviços fornecidos pelo Microsoft Entra? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Segurança",
+                options: [
+                    { text: "autenticação", correct: true },
+                    { text: "SSO (logon único)", correct: true },
+                    { text: "firewall", correct: false },
+                    { text: "criptografia", correct: false }
+                ],
+                explanation: "Microsoft Entra fornece autenticação e SSO."
+            },
+            {
+                id: 32,
+                question: "Qual recurso do Microsoft Entra você pode usar para garantir que os usuários só possam acessar aplicativos do Microsoft Office 365 de aplicativos cliente aprovados?",
+                type: "single",
+                category: "Segurança",
+                options: [
+                    { text: "Acesso Condicional", correct: true },
+                    { text: "MFA (autenticação multifator)", correct: false },
+                    { text: "Identity Protection", correct: false },
+                    { text: "Privileged Identity Management", correct: false }
+                ],
+                explanation: "Acesso Condicional controla acesso baseado em condições."
+            },
+            {
+                id: 33,
+                question: "O que você pode usar para garantir que os usuários se autentiquem usando a MFA (autenticação multifator) ao tentarem entrar de um local específico?",
+                type: "single",
+                category: "Segurança",
+                options: [
+                    { text: "Acesso Condicional", correct: true },
+                    { text: "Identity Protection", correct: false },
+                    { text: "Privileged Identity Management", correct: false },
+                    { text: "Log Analytics", correct: false }
+                ],
+                explanation: "Acesso Condicional pode exigir MFA baseado em condições."
+            },
+            {
+                id: 34,
+                question: "Quais dois fatores afetam os custos do Azure? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Custos",
+                options: [
+                    { text: "seleção de zona de disponibilidade", correct: false },
+                    { text: "local do recurso", correct: true },
+                    { text: "uso de recursos", correct: true },
+                    { text: "cor do portal", correct: false }
+                ],
+                explanation: "Localização e uso afetam custos."
+            },
+            {
+                id: 35,
+                question: "Você precisa comparar os custos de execução de um aplicativo em um datacenter local com os custos de execução do aplicativo no Azure. O que você deve usar para ajudá-lo?",
+                type: "single",
+                category: "Custos",
+                options: [
+                    { text: "Calculadora de TCO (Custo Total de Propriedade)", correct: true },
+                    { text: "Azure Pricing Calculator", correct: false },
+                    { text: "Azure Cost Management", correct: false },
+                    { text: "Azure Advisor", correct: false }
+                ],
+                explanation: "Calculadora de TCO compara custos locais vs nuvem."
+            },
+            {
+                id: 36,
+                question: "Quais são dois cenários comuns para usar marcas de recurso? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Custos",
+                options: [
+                    { text: "associando custos com ambientes diferentes", correct: true },
+                    { text: "categorizando custos por departamento", correct: true },
+                    { text: "redimensionando máquinas virtuais", correct: false },
+                    { text: "provisionando recursos em regiões de menor custo", correct: false }
+                ],
+                explanation: "Marcas ajudam a categorizar custos."
+            },
+            {
+                id: 37,
+                question: "Quais são os dois recursos disponíveis usando o Gerenciamento de Custos do Azure + Cobrança? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Custos",
+                options: [
+                    { text: "Criar e gerenciar orçamentos.", correct: true },
+                    { text: "Gerar relatórios históricos e prever o uso futuro.", correct: true },
+                    { text: "Configurar autenticação multifator", correct: false },
+                    { text: "Implantar máquinas virtuais", correct: false }
+                ],
+                explanation: "Gerenciamento de Custos oferece orçamentos e relatórios."
+            },
+            {
+                id: 38,
+                question: "O que você pode usar para garantir que os recursos novos e existentes do Azure permaneçam em conformidade com os padrões corporativos?",
+                type: "single",
+                category: "Governança",
+                options: [
+                    { text: "Azure Policy", correct: true },
+                    { text: "Azure Blueprints", correct: false },
+                    { text: "Azure Resource Manager", correct: false },
+                    { text: "Azure Monitor", correct: false }
+                ],
+                explanation: "Azure Policy impõe conformidade."
+            },
+            {
+                id: 39,
+                question: "O que você pode aplicar a uma máquina virtual do Azure para garantir que os usuários não possam alterar ou excluir o recurso?",
+                type: "single",
+                category: "Governança",
+                options: [
+                    { text: "um bloqueio", correct: true },
+                    { text: "uma marca", correct: false },
+                    { text: "uma política", correct: false },
+                    { text: "uma identidade gerenciada", correct: false }
+                ],
+                explanation: "Bloqueios impedem alteração/exclusão."
+            },
+            {
+                id: 40,
+                question: "O que você pode usar para restringir a implantação de uma máquina virtual a um local específico?",
+                type: "single",
+                category: "Governança",
+                options: [
+                    { text: "Azure Policy", correct: true },
+                    { text: "Azure Resource Manager", correct: false },
+                    { text: "Azure Blueprints", correct: false },
+                    { text: "Azure Monitor", correct: false }
+                ],
+                explanation: "Azure Policy pode restringir regiões."
+            },
+            {
+                id: 41,
+                question: "O que você deve usar para acessar o Azure Cloud Shell?",
+                type: "single",
+                category: "Ferramentas",
+                options: [
+                    { text: "um navegador da Web", correct: true },
+                    { text: "PowerShell local", correct: false },
+                    { text: "Azure CLI local", correct: false },
+                    { text: "Visual Studio Code", correct: false }
+                ],
+                explanation: "Cloud Shell é acessado via navegador."
+            },
+            {
+                id: 42,
+                question: "Quais duas ferramentas você pode usar para criar uma nova máquina virtual do Azure a partir de um dispositivo móvel que executa o Android? Cada resposta correta apresenta uma solução completa.",
+                type: "multiple",
+                category: "Ferramentas",
+                options: [
+                    { text: "PowerShell no Azure Cloud Shell", correct: true },
+                    { text: "o portal do Azure", correct: true },
+                    { text: "Visual Studio", correct: false },
+                    { text: "Azure CLI local", correct: false }
+                ],
+                explanation: "Ambos funcionam em navegadores móveis."
+            },
+            {
+                id: 43,
+                question: "O que você pode usar para gerenciar servidores em plataformas de nuvem de terceiros e ambientes locais?",
+                type: "single",
+                category: "Ferramentas",
+                options: [
+                    { text: "Azure Arc", correct: true },
+                    { text: "Azure Policy", correct: false },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Azure Resource Manager", correct: false }
+                ],
+                explanation: "Azure Arc gerencia ambientes híbridos."
+            },
+            {
+                id: 44,
+                question: "Qual serviço do Azure avalia os recursos do Azure e faz recomendações para ajudar a melhorar a confiabilidade, a segurança, o desempenho e a redução de custos?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Integridade do Serviço do Azure", correct: false },
+                    { text: "Assistente do Azure", correct: true },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Azure Policy", correct: false }
+                ],
+                explanation: "Azure Advisor faz recomendações."
+            },
+            {
+                id: 45,
+                question: "Você precisa examinar o relatório RCA (análise de causa raiz) para uma interrupção de serviço que ocorreu na semana passada. Onde você deve procurar o relatório?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Integridade do Serviço do Azure", correct: true },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Azure Advisor", correct: false },
+                    { text: "Log Analytics", correct: false }
+                ],
+                explanation: "Service Health fornece RCAs de interrupções."
+            },
+            {
+                id: 46,
+                question: "Você precisa criar uma solução personalizada que use limites para disparar a funcionalidade de dimensionamento automático para escalar ou reduzir verticalmente um aplicativo para atender à demanda do usuário. O que você deve incluir na solução?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Azure Monitor", correct: true },
+                    { text: "Azure Advisor", correct: false },
+                    { text: "Azure Policy", correct: false },
+                    { text: "Azure Service Health", correct: false }
+                ],
+                explanation: "Azure Monitor fornece métricas para autoscaling."
+            },
+            {
+                id: 47,
+                question: "O que você deve revisar e agir proativamente para evitar interrupções de serviço, como aposentadorias de serviços e alterações significativas?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "avisos de integridade", correct: true },
+                    { text: "problemas de serviço", correct: false },
+                    { text: "relatórios RCA", correct: false },
+                    { text: "logs de atividade", correct: false }
+                ],
+                explanation: "Avisos de integridade alertam sobre mudanças planejadas."
+            },
+            {
+                id: 48,
+                question: "O que você pode usar para detectar automaticamente anomalias de desempenho para aplicativos Web?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Azure Application Insights", correct: true },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Azure Service Health", correct: false },
+                    { text: "Azure Advisor", correct: false }
+                ],
+                explanation: "Application Insights monitora apps web."
+            },
+            {
+                id: 49,
+                question: "O que você pode usar para receber uma notificação sobre uma interrupção em uma região específica do Azure?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Integridade do Serviço do Azure", correct: true },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Azure Advisor", correct: false },
+                    { text: "Application Insights", correct: false }
+                ],
+                explanation: "Service Health notifica sobre interrupções."
+            },
+            {
+                id: 50,
+                question: "O que você pode usar para encontrar informações sobre a manutenção planejada para os serviços do Azure que são essenciais para sua organização?",
+                type: "single",
+                category: "Monitoramento",
+                options: [
+                    { text: "Assistente do Azure", correct: false },
+                    { text: "Integridade do Serviço do Azure", correct: true },
+                    { text: "Azure Monitor", correct: false },
+                    { text: "Application Insights", correct: false }
+                ],
+                explanation: "Service Health mostra manutenção planejada."
             }
         ];
 
-        // Estado do questionário
-        let currentQuestionIndex = 0;
-        let userAnswers = Array(questions.length).fill(null);
-        let testCompleted = false;
+        // Estado do quiz
+        let currentQuestion = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+        let score = 0;
+        let quizCompleted = false;
+        let incorrectQuestions = [];
+        
+        // Estado da revisão
+        let inReviewMode = false;
+        let currentReviewQuestion = 0;
+        let reviewAnswers = [];
+        let reviewScore = 0;
+        let reviewCompleted = false;
 
-        // Inicializar o questionário
+        // Elementos DOM
+        const questionCounter = document.getElementById('question-counter');
+        const categoryElement = document.getElementById('category');
+        const questionTypeElement = document.getElementById('question-type');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationContainer = document.getElementById('explanation-container');
+        const explanationText = document.getElementById('explanation-text');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const restartBtn2 = document.getElementById('restart-btn-2');
+        const startReviewBtn = document.getElementById('start-review-btn');
+        const progressBar = document.getElementById('progress');
+        
+        // Resultados principais
+        const resultsContainer = document.getElementById('results-container');
+        const questionContainer = document.getElementById('question-container');
+        const scoreElement = document.getElementById('score');
+        const correctAnswersElement = document.getElementById('correct-answers');
+        const totalQuestionsElement = document.getElementById('total-questions');
+        const scoreTextElement = document.getElementById('score-text');
+        const correctCountElement = document.getElementById('correct-count');
+        const incorrectCountElement = document.getElementById('incorrect-count');
+        const percentageElement = document.getElementById('percentage');
+        const reviewSection = document.getElementById('review-section');
+        const wrongCountElement = document.getElementById('wrong-count');
+        const reviewMessage = document.getElementById('review-message');
+        
+        // Elementos da revisão
+        const reviewContainer = document.getElementById('review-container');
+        const reviewProgressBar = document.getElementById('review-progress');
+        const reviewQuestionCounter = document.getElementById('review-question-counter');
+        const reviewStats = document.getElementById('review-stats');
+        const reviewCategory = document.getElementById('review-category');
+        const reviewQuestionType = document.getElementById('review-question-type');
+        const reviewQuestionText = document.getElementById('review-question-text');
+        const reviewOptionsContainer = document.getElementById('review-options-container');
+        const reviewExplanationContainer = document.getElementById('review-explanation-container');
+        const reviewExplanationText = document.getElementById('review-explanation-text');
+        const reviewPrevBtn = document.getElementById('review-prev-btn');
+        const reviewNextBtn = document.getElementById('review-next-btn');
+        const submitReviewBtn = document.getElementById('submit-review-btn');
+        
+        // Resultados da revisão
+        const reviewResultsContainer = document.getElementById('review-results-container');
+        const reviewScoreElement = document.getElementById('review-score');
+        const reviewCorrectAnswersElement = document.getElementById('review-correct-answers');
+        const reviewTotalQuestionsElement = document.getElementById('review-total-questions');
+        const reviewScoreTextElement = document.getElementById('review-score-text');
+        const reviewCorrectCountElement = document.getElementById('review-correct-count');
+        const reviewIncorrectCountElement = document.getElementById('review-incorrect-count');
+        const reviewImprovementElement = document.getElementById('review-improvement');
+        const improvementTextElement = document.getElementById('improvement-text');
+        const backToMainResultsBtn = document.getElementById('back-to-main-results-btn');
+        const restartReviewBtn = document.getElementById('restart-review-btn');
+        const restartFullQuizBtn = document.getElementById('restart-full-quiz-btn');
+
+        // Inicializar quiz principal
         function initQuiz() {
-            loadQuestion(currentQuestionIndex);
-            updateQuestionList();
+            loadQuestion(currentQuestion);
             updateProgress();
-            
-            // Configurar eventos dos botões
-            document.getElementById('prev-btn').addEventListener('click', prevQuestion);
-            document.getElementById('next-btn').addEventListener('click', nextQuestion);
-            document.getElementById('check-btn').addEventListener('click', checkAnswer);
-            document.getElementById('finish-btn').addEventListener('click', finishTest);
-        }
-
-        // Carregar questão
-        function loadQuestion(index) {
-            const question = questions[index];
-            const container = document.getElementById('question-container');
-            
-            let optionsHtml = '';
-            question.options.forEach(option => {
-                const isSelected = userAnswers[index] && userAnswers[index].includes(option.id);
-                const optionClass = isSelected ? 'option selected' : 'option';
-                
-                optionsHtml += `
-                    <div class="${optionClass}" data-id="${option.id}">
-                        <div class="option-marker">${option.id.toUpperCase()}</div>
-                        <div>${option.text}</div>
-                    </div>
-                `;
-            });
-            
-            const questionType = question.type === 'multiple' ? 
-                '(Selecione todas as respostas aplicáveis)' : 
-                '(Selecione uma resposta)';
-            
-            container.innerHTML = `
-                <div class="question-card active">
-                    <div class="question-number">Questão ${index + 1} de ${questions.length}</div>
-                    <div class="question-text">${question.text} ${questionType}</div>
-                    <div class="options">${optionsHtml}</div>
-                    <div id="feedback" class="feedback"></div>
-                </div>
-            `;
-            
-            // Adicionar eventos de clique às opções
-            document.querySelectorAll('.option').forEach(option => {
-                option.addEventListener('click', function() {
-                    if (!testCompleted) {
-                        selectOption(this, question.type);
-                    }
-                });
-            });
-            
-            // Atualizar lista de questões
-            updateActiveQuestionInList(index);
-            
-            // Atualizar estado dos botões
             updateButtons();
-            
-            // Limpar feedback
-            document.getElementById('feedback').className = 'feedback';
         }
 
-        // Selecionar opção
-        function selectOption(optionElement, questionType) {
-            const optionId = optionElement.getAttribute('data-id');
+        // Carregar pergunta principal
+        function loadQuestion(questionIndex) {
+            const question = quizData[questionIndex];
             
-            // Se for questão de única escolha
+            // Atualizar elementos de exibição
+            questionCounter.textContent = `Pergunta ${questionIndex + 1} de ${quizData.length}`;
+            categoryElement.textContent = question.category;
+            questionTypeElement.textContent = `Tipo: ${question.type === 'single' ? 'Escolha única' : 'Múltipla escolha'}`;
+            questionTextElement.textContent = question.question;
+            
+            // Limpar opções anteriores
+            optionsContainer.innerHTML = '';
+            
+            // Criar opções
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                // Verificar se esta opção já foi selecionada anteriormente
+                const isSelected = userAnswers[questionIndex] && 
+                    (question.type === 'single' 
+                        ? userAnswers[questionIndex] === index 
+                        : userAnswers[questionIndex].includes(index));
+                
+                if (isSelected) {
+                    optionElement.classList.add('selected');
+                }
+                
+                // Criar input baseado no tipo da pergunta
+                let inputElement;
+                if (question.type === 'single') {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'radio';
+                    inputElement.name = 'option';
+                    inputElement.value = index;
+                    inputElement.checked = isSelected;
+                } else {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'checkbox';
+                    inputElement.name = 'option';
+                    inputElement.value = index;
+                    inputElement.checked = isSelected;
+                }
+                
+                const labelElement = document.createElement('div');
+                labelElement.className = 'option-label';
+                labelElement.textContent = option.text;
+                
+                optionElement.appendChild(inputElement);
+                optionElement.appendChild(labelElement);
+                
+                // Adicionar evento de clique
+                optionElement.addEventListener('click', () => selectOption(optionElement, index, question.type));
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Mostrar/ocultar explicação baseado no estado do quiz
+            if (quizCompleted && userAnswers[questionIndex] !== null) {
+                showExplanation(questionIndex);
+            } else {
+                explanationContainer.style.display = 'none';
+            }
+        }
+
+        // Carregar pergunta de revisão (interativa)
+        function loadReviewQuestion(questionIndex) {
+            if (incorrectQuestions.length === 0) return;
+            
+            const originalIndex = incorrectQuestions[questionIndex];
+            const question = quizData[originalIndex];
+            
+            // Atualizar elementos de exibição
+            reviewQuestionCounter.textContent = `Pergunta ${questionIndex + 1} de ${incorrectQuestions.length}`;
+            reviewCategory.textContent = question.category;
+            reviewQuestionType.textContent = `Tipo: ${question.type === 'single' ? 'Escolha única' : 'Múltipla escolha'}`;
+            reviewQuestionText.textContent = question.question;
+            
+            // Atualizar barra de progresso da revisão
+            const reviewProgressPercentage = ((questionIndex + 1) / incorrectQuestions.length) * 100;
+            reviewProgressBar.style.width = `${reviewProgressPercentage}%`;
+            
+            // Limpar opções anteriores
+            reviewOptionsContainer.innerHTML = '';
+            
+            // Criar opções (interativas para resposta)
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                // Verificar se esta opção já foi selecionada na revisão
+                const isSelected = reviewAnswers[questionIndex] && 
+                    (question.type === 'single' 
+                        ? reviewAnswers[questionIndex] === index 
+                        : reviewAnswers[questionIndex].includes(index));
+                
+                if (isSelected) {
+                    optionElement.classList.add('selected');
+                }
+                
+                // Se a revisão já foi completada, mostrar se a resposta está correta
+                if (reviewCompleted) {
+                    if (option.correct) {
+                        optionElement.classList.add('correct');
+                    } else if (isSelected && !option.correct) {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+                
+                // Criar input baseado no tipo da pergunta
+                let inputElement;
+                if (question.type === 'single') {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'radio';
+                    inputElement.name = 'review-option';
+                    inputElement.value = index;
+                    inputElement.checked = isSelected;
+                    inputElement.disabled = reviewCompleted; // Desabilitar se revisão completada
+                } else {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'checkbox';
+                    inputElement.name = 'review-option';
+                    inputElement.value = index;
+                    inputElement.checked = isSelected;
+                    inputElement.disabled = reviewCompleted; // Desabilitar se revisão completada
+                }
+                
+                const labelElement = document.createElement('div');
+                labelElement.className = 'option-label';
+                labelElement.textContent = option.text;
+                
+                optionElement.appendChild(inputElement);
+                optionElement.appendChild(labelElement);
+                
+                // Adicionar evento de clique apenas se não estiver completado
+                if (!reviewCompleted) {
+                    optionElement.addEventListener('click', () => selectReviewOption(optionElement, index, question.type, questionIndex));
+                }
+                
+                reviewOptionsContainer.appendChild(optionElement);
+            });
+            
+            // Mostrar/ocultar explicação baseado no estado da revisão
+            if (reviewCompleted) {
+                reviewExplanationText.textContent = question.explanation;
+                reviewExplanationContainer.style.display = 'block';
+            } else {
+                reviewExplanationContainer.style.display = 'none';
+            }
+        }
+
+        // Selecionar opção no quiz principal
+        function selectOption(optionElement, optionIndex, questionType) {
+            const question = quizData[currentQuestion];
+            
+            // Se o quiz já foi completado, não permitir alterações
+            if (quizCompleted) return;
+            
+            // Para perguntas de escolha única
             if (questionType === 'single') {
-                // Desmarcar todas as outras opções
+                // Remover seleção anterior
                 document.querySelectorAll('.option').forEach(opt => {
                     opt.classList.remove('selected');
+                    opt.querySelector('input').checked = false;
                 });
                 
                 // Marcar a opção selecionada
                 optionElement.classList.add('selected');
+                optionElement.querySelector('input').checked = true;
                 
                 // Salvar resposta
-                userAnswers[currentQuestionIndex] = [optionId];
+                userAnswers[currentQuestion] = optionIndex;
             } 
-            // Se for questão de múltipla escolha
-            else if (questionType === 'multiple') {
+            // Para perguntas de múltipla escolha
+            else {
                 // Alternar seleção
                 optionElement.classList.toggle('selected');
+                const input = optionElement.querySelector('input');
+                input.checked = !input.checked;
                 
-                // Coletar todas as opções selecionadas
+                // Obter todas as opções selecionadas
                 const selectedOptions = [];
-                document.querySelectorAll('.option.selected').forEach(opt => {
-                    selectedOptions.push(opt.getAttribute('data-id'));
+                document.querySelectorAll('.option').forEach((opt, idx) => {
+                    if (opt.querySelector('input').checked) {
+                        selectedOptions.push(idx);
+                    }
                 });
                 
                 // Salvar resposta
-                userAnswers[currentQuestionIndex] = selectedOptions;
+                userAnswers[currentQuestion] = selectedOptions.length > 0 ? selectedOptions : null;
             }
             
-            // Atualizar progresso
-            updateProgress();
-            updateQuestionList();
+            updateButtons();
         }
 
-        // Verificar resposta
-        function checkAnswer() {
-            if (testCompleted) return;
+        // Selecionar opção na revisão
+        function selectReviewOption(optionElement, optionIndex, questionType, reviewQuestionIndex) {
+            const originalIndex = incorrectQuestions[reviewQuestionIndex];
+            const question = quizData[originalIndex];
             
-            const question = questions[currentQuestionIndex];
-            const userAnswer = userAnswers[currentQuestionIndex];
-            const feedback = document.getElementById('feedback');
-            
-            if (!userAnswer || userAnswer.length === 0) {
-                feedback.className = 'feedback incorrect';
-                feedback.innerHTML = '<div class="feedback-title">⚠️ Selecione uma ou mais opções antes de verificar</div>';
-                return;
-            }
-            
-            // Determinar se a resposta está correta
-            let isCorrect = false;
-            
-            if (question.type === 'single') {
-                // Para questões de única escolha
-                const correctOption = question.options.find(opt => opt.correct);
-                isCorrect = userAnswer[0] === correctOption.id;
-            } else {
-                // Para questões de múltipla escolha
-                const correctOptions = question.options.filter(opt => opt.correct).map(opt => opt.id);
-                const userSelected = userAnswer || [];
+            // Para perguntas de escolha única
+            if (questionType === 'single') {
+                // Remover seleção anterior
+                reviewOptionsContainer.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    opt.querySelector('input').checked = false;
+                });
                 
-                // Verificar se todas as corretas foram selecionadas e nenhuma incorreta
-                isCorrect = correctOptions.length === userSelected.length && 
-                           correctOptions.every(opt => userSelected.includes(opt));
-            }
-            
-            // Mostrar feedback
-            if (isCorrect) {
-                feedback.className = 'feedback correct';
-                feedback.innerHTML = `
-                    <div class="feedback-title">✅ Resposta Correta!</div>
-                    <div>${question.explanation}</div>
-                `;
-            } else {
-                feedback.className = 'feedback incorrect';
+                // Marcar a opção selecionada
+                optionElement.classList.add('selected');
+                optionElement.querySelector('input').checked = true;
                 
-                // Mostrar as respostas corretas
-                const correctOptions = question.options.filter(opt => opt.correct).map(opt => opt.text);
-                const correctText = question.type === 'single' ? correctOptions[0] : correctOptions.join(', ');
+                // Salvar resposta
+                reviewAnswers[reviewQuestionIndex] = optionIndex;
+            } 
+            // Para perguntas de múltipla escolha
+            else {
+                // Alternar seleção
+                optionElement.classList.toggle('selected');
+                const input = optionElement.querySelector('input');
+                input.checked = !input.checked;
                 
-                feedback.innerHTML = `
-                    <div class="feedback-title">❌ Resposta Incorreta</div>
-                    <div><strong>Resposta(s) correta(s):</strong> ${correctText}</div>
-                    <div style="margin-top: 10px;">${question.explanation}</div>
-                `;
-            }
-            
-            // Destacar opções corretas e incorretas
-            highlightOptions();
-        }
-
-        // Destacar opções corretas/incorretas
-        function highlightOptions() {
-            const question = questions[currentQuestionIndex];
-            
-            document.querySelectorAll('.option').forEach(optionElement => {
-                const optionId = optionElement.getAttribute('data-id');
-                const option = question.options.find(opt => opt.id === optionId);
-                
-                // Limpar classes anteriores
-                optionElement.classList.remove('correct', 'incorrect');
-                
-                // Verificar se esta opção está selecionada
-                const isSelected = optionElement.classList.contains('selected');
-                
-                // Adicionar classe apropriada
-                if (option.correct) {
-                    optionElement.classList.add('correct');
-                } else if (isSelected && !option.correct) {
-                    optionElement.classList.add('incorrect');
-                }
-            });
-        }
-
-        // Próxima questão
-        function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1 && !testCompleted) {
-                currentQuestionIndex++;
-                loadQuestion(currentQuestionIndex);
-            }
-        }
-
-        // Questão anterior
-        function prevQuestion() {
-            if (currentQuestionIndex > 0 && !testCompleted) {
-                currentQuestionIndex--;
-                loadQuestion(currentQuestionIndex);
-            }
-        }
-
-        // Finalizar teste
-        function finishTest() {
-            if (testCompleted) return;
-            
-            // Verificar se todas as questões foram respondidas
-            const unansweredQuestions = userAnswers.filter(answer => !answer || answer.length === 0).length;
-            
-            if (unansweredQuestions > 0) {
-                if (!confirm(`Você tem ${unansweredQuestions} questão(ões) não respondida(s). Deseja finalizar mesmo assim?`)) {
-                    return;
-                }
-            }
-            
-            testCompleted = true;
-            const score = calculateScore();
-            showResults(score);
-            
-            // Desativar botões de navegação
-            document.getElementById('prev-btn').disabled = true;
-            document.getElementById('next-btn').disabled = true;
-            document.getElementById('check-btn').disabled = true;
-            document.getElementById('finish-btn').textContent = 'Teste Finalizado';
-            document.getElementById('finish-btn').disabled = true;
-        }
-
-        // Calcular pontuação
-        function calculateScore() {
-            let score = 0;
-            
-            questions.forEach((question, index) => {
-                const userAnswer = userAnswers[index];
-                
-                if (!userAnswer || userAnswer.length === 0) return;
-                
-                if (question.type === 'single') {
-                    // Para questões de única escolha
-                    const correctOption = question.options.find(opt => opt.correct);
-                    if (userAnswer[0] === correctOption.id) {
-                        score++;
-                    }
-                } else {
-                    // Para questões de múltipla escolha
-                    const correctOptions = question.options.filter(opt => opt.correct).map(opt => opt.id);
-                    const userSelected = userAnswer || [];
-                    
-                    // Verificar se todas as corretas foram selecionadas e nenhuma incorreta
-                    if (correctOptions.length === userSelected.length && 
-                        correctOptions.every(opt => userSelected.includes(opt))) {
-                        score++;
-                    }
-                }
-            });
-            
-            return score;
-        }
-
-        // Mostrar resultados
-        function showResults(score) {
-            const percentage = Math.round((score / questions.length) * 100);
-            
-            // Atualizar círculo de pontuação
-            const scoreCircle = document.getElementById('score-circle');
-            scoreCircle.style.background = `conic-gradient(#28a745 0% ${percentage}%, #e0e0e0 ${percentage}% 100%)`;
-            
-            document.querySelector('.score-value').textContent = `${percentage}%`;
-            document.querySelector('.score-label').textContent = 'Pontuação';
-            
-            // Atualizar texto de pontuação
-            let scoreText = '';
-            if (percentage === 100) {
-                scoreText = 'Excelente! Você acertou todas as questões! 🎉';
-            } else if (percentage >= 80) {
-                scoreText = 'Muito bom! Você tem um bom conhecimento dos fundamentos do Azure. 👍';
-            } else if (percentage >= 60) {
-                scoreText = 'Bom trabalho! Continue estudando para melhorar seu desempenho. 💪';
-            } else {
-                scoreText = 'Continue praticando! Revise os conceitos fundamentais do Azure. 📚';
-            }
-            
-            document.getElementById('score-text').innerHTML = `
-                <strong>${score} de ${questions.length} questões corretas</strong><br>
-                ${scoreText}
-            `;
-        }
-
-        // Atualizar lista de questões
-        function updateQuestionList() {
-            const list = document.getElementById('question-list');
-            list.innerHTML = '';
-            
-            questions.forEach((question, index) => {
-                const listItem = document.createElement('li');
-                listItem.setAttribute('data-index', index);
-                
-                // Verificar se a questão foi respondida
-                const isAnswered = userAnswers[index] && userAnswers[index].length > 0;
-                const statusClass = isAnswered ? 'answered' : 'unanswered';
-                const statusText = isAnswered ? '✓' : '?';
-                
-                listItem.innerHTML = `
-                    <div class="question-status ${statusClass}">${statusText}</div>
-                    <span>Questão ${index + 1}</span>
-                `;
-                
-                // Adicionar evento de clique para navegar para a questão
-                listItem.addEventListener('click', function() {
-                    if (!testCompleted) {
-                        currentQuestionIndex = index;
-                        loadQuestion(currentQuestionIndex);
+                // Obter todas as opções selecionadas
+                const selectedOptions = [];
+                reviewOptionsContainer.querySelectorAll('.option').forEach((opt, idx) => {
+                    if (opt.querySelector('input').checked) {
+                        selectedOptions.push(idx);
                     }
                 });
                 
-                list.appendChild(listItem);
-            });
-            
-            // Destacar a questão atual
-            updateActiveQuestionInList(currentQuestionIndex);
-        }
-
-        // Atualizar questão ativa na lista
-        function updateActiveQuestionInList(index) {
-            document.querySelectorAll('.question-list li').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            const activeItem = document.querySelector(`.question-list li[data-index="${index}"]`);
-            if (activeItem) {
-                activeItem.classList.add('active');
+                // Salvar resposta
+                reviewAnswers[reviewQuestionIndex] = selectedOptions.length > 0 ? selectedOptions : null;
             }
+            
+            updateReviewButtons();
         }
 
-        // Atualizar progresso
+        // Mostrar explicação no quiz principal
+        function showExplanation(questionIndex) {
+            const question = quizData[questionIndex];
+            explanationText.textContent = question.explanation;
+            explanationContainer.style.display = 'block';
+            
+            // Destacar opções corretas e incorretas
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                const isCorrect = question.options[index].correct;
+                const wasSelected = userAnswers[questionIndex] && 
+                    (question.type === 'single' 
+                        ? userAnswers[questionIndex] === index 
+                        : userAnswers[questionIndex].includes(index));
+                
+                if (isCorrect) {
+                    option.classList.add('correct');
+                } else if (wasSelected && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                
+                // Desabilitar interação
+                option.style.cursor = 'default';
+                option.querySelector('input').disabled = true;
+            });
+        }
+
+        // Atualizar barra de progresso principal
         function updateProgress() {
-            const answeredQuestions = userAnswers.filter(answer => answer && answer.length > 0).length;
-            const progressPercentage = Math.round((answeredQuestions / questions.length) * 100);
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Atualizar botões principais
+        function updateButtons() {
+            // Botão Anterior
+            prevBtn.disabled = currentQuestion === 0;
             
-            // Atualizar círculo de progresso (se o teste não foi finalizado)
-            if (!testCompleted) {
-                const scoreCircle = document.getElementById('score-circle');
-                scoreCircle.style.background = `conic-gradient(#0078d4 0% ${progressPercentage}%, #e0e0e0 ${progressPercentage}% 100%)`;
-                
-                document.querySelector('.score-value').textContent = `${progressPercentage}%`;
-                document.querySelector('.score-label').textContent = 'Progresso';
-                
-                document.getElementById('score-text').innerHTML = `
-                    <strong>${answeredQuestions} de ${questions.length} questões respondidas</strong><br>
-                    Responda todas as questões e clique em "Finalizar Teste" para ver sua pontuação.
-                `;
+            // Botão Próxima/Enviar
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+                submitBtn.disabled = userAnswers[currentQuestion] === null;
+            } else {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+                nextBtn.disabled = userAnswers[currentQuestion] === null;
             }
             
-            // Atualizar estado do botão de finalizar
-            document.getElementById('finish-btn').disabled = testCompleted;
+            // Botão Reiniciar e Revisar
+            restartBtn.style.display = quizCompleted ? 'inline-block' : 'none';
+            reviewBtn.style.display = quizCompleted && incorrectQuestions.length > 0 ? 'inline-block' : 'none';
         }
 
-        // Atualizar estado dos botões
-        function updateButtons() {
-            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0 || testCompleted;
-            document.getElementById('next-btn').disabled = currentQuestionIndex === questions.length - 1 || testCompleted;
-            document.getElementById('check-btn').disabled = testCompleted;
+        // Atualizar botões da revisão
+        function updateReviewButtons() {
+            // Botão Anterior
+            reviewPrevBtn.disabled = currentReviewQuestion === 0;
+            
+            // Botão Próxima/Enviar
+            if (currentReviewQuestion === incorrectQuestions.length - 1) {
+                reviewNextBtn.style.display = 'none';
+                submitReviewBtn.style.display = 'inline-block';
+                submitReviewBtn.disabled = reviewAnswers[currentReviewQuestion] === null;
+            } else {
+                reviewNextBtn.style.display = 'inline-block';
+                submitReviewBtn.style.display = 'none';
+                reviewNextBtn.disabled = reviewAnswers[currentReviewQuestion] === null;
+            }
         }
 
-        // Inicializar o questionário quando a página carregar
-        document.addEventListener('DOMContentLoaded', initQuiz);
+        // Navegar para próxima pergunta principal
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        // Navegar para pergunta anterior principal
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion(currentQuestion);
+                updateProgress();
+                updateButtons();
+            }
+        }
+
+        // Navegar para próxima pergunta de revisão
+        function nextReviewQuestion() {
+            if (currentReviewQuestion < incorrectQuestions.length - 1) {
+                currentReviewQuestion++;
+                loadReviewQuestion(currentReviewQuestion);
+                updateReviewButtons();
+            }
+        }
+
+        // Navegar para pergunta anterior de revisão
+        function prevReviewQuestion() {
+            if (currentReviewQuestion > 0) {
+                currentReviewQuestion--;
+                loadReviewQuestion(currentReviewQuestion);
+                updateReviewButtons();
+            }
+        }
+
+        // Calcular pontuação e identificar perguntas erradas
+        function calculateScoreAndIncorrect() {
+            let correctCount = 0;
+            incorrectQuestions = [];
+            
+            quizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                
+                if (userAnswer !== null) {
+                    if (question.type === 'single') {
+                        // Para escolha única, verificar se a opção selecionada está correta
+                        if (question.options[userAnswer].correct) {
+                            correctCount++;
+                        } else {
+                            incorrectQuestions.push(index);
+                        }
+                    } else {
+                        // Para múltipla escolha, verificar se todas as corretas foram selecionadas
+                        // e nenhuma incorreta foi selecionada
+                        const correctOptions = question.options
+                            .map((opt, idx) => opt.correct ? idx : -1)
+                            .filter(idx => idx !== -1);
+                        
+                        const userSelected = userAnswer || [];
+                        
+                        // Verificar se o usuário selecionou exatamente as opções corretas
+                        const isCorrect = correctOptions.length === userSelected.length &&
+                            correctOptions.every(opt => userSelected.includes(opt));
+                        
+                        if (isCorrect) {
+                            correctCount++;
+                        } else {
+                            incorrectQuestions.push(index);
+                        }
+                    }
+                } else {
+                    // Se não respondeu, considera como erro
+                    incorrectQuestions.push(index);
+                }
+            });
+            
+            return correctCount;
+        }
+
+        // Calcular pontuação da revisão
+        function calculateReviewScore() {
+            let correctCount = 0;
+            
+            incorrectQuestions.forEach((originalIndex, reviewIndex) => {
+                const question = quizData[originalIndex];
+                const userAnswer = reviewAnswers[reviewIndex];
+                
+                if (userAnswer !== null) {
+                    if (question.type === 'single') {
+                        // Para escolha única, verificar se a opção selecionada está correta
+                        if (question.options[userAnswer].correct) {
+                            correctCount++;
+                        }
+                    } else {
+                        // Para múltipla escolha, verificar se todas as corretas foram selecionadas
+                        const correctOptions = question.options
+                            .map((opt, idx) => opt.correct ? idx : -1)
+                            .filter(idx => idx !== -1);
+                        
+                        const userSelected = userAnswer || [];
+                        
+                        // Verificar se o usuário selecionou exatamente as opções corretas
+                        const isCorrect = correctOptions.length === userSelected.length &&
+                            correctOptions.every(opt => userSelected.includes(opt));
+                        
+                        if (isCorrect) {
+                            correctCount++;
+                        }
+                    }
+                }
+            });
+            
+            return correctCount;
+        }
+
+        // Mostrar resultados principais
+        function showResults() {
+            score = calculateScoreAndIncorrect();
+            const percentage = Math.round((score / quizData.length) * 100);
+            const incorrectCount = quizData.length - score;
+            
+            // Atualizar elementos de resultados
+            scoreElement.textContent = `${percentage}%`;
+            correctAnswersElement.textContent = score;
+            totalQuestionsElement.textContent = quizData.length;
+            correctCountElement.textContent = score;
+            incorrectCountElement.textContent = incorrectCount;
+            percentageElement.textContent = `${percentage}%`;
+            wrongCountElement.textContent = incorrectCount;
+            
+            // Texto baseado na pontuação
+            let scoreText = "";
+            if (percentage >= 90) {
+                scoreText = "Excelente! Você demonstrou um conhecimento excepcional!";
+            } else if (percentage >= 70) {
+                scoreText = "Bom trabalho! Você tem um bom entendimento dos conceitos.";
+            } else if (percentage >= 50) {
+                scoreText = "Razoável. Continue estudando para melhorar seu conhecimento.";
+            } else {
+                scoreText = "Recomenda-se revisar os conceitos fundamentais.";
+            }
+            
+            scoreTextElement.textContent = scoreText;
+            
+            // Mostrar/ocultar seção de revisão
+            if (incorrectCount > 0) {
+                reviewSection.style.display = 'block';
+                reviewMessage.textContent = `Você errou ${incorrectCount} pergunta(s).`;
+            } else {
+                reviewSection.style.display = 'none';
+            }
+            
+            // Mostrar contêiner de resultados e ocultar perguntas
+            resultsContainer.style.display = 'block';
+            questionContainer.style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.querySelector('.buttons-container').style.display = 'none';
+            
+            // Marcar quiz como completado
+            quizCompleted = true;
+            
+            // Mostrar explicação para a última pergunta
+            loadQuestion(currentQuestion);
+        }
+
+        // Iniciar modo de revisão
+        function startReviewMode() {
+            inReviewMode = true;
+            currentReviewQuestion = 0;
+            reviewAnswers = Array(incorrectQuestions.length).fill(null);
+            reviewCompleted = false;
+            
+            // Atualizar estatísticas de revisão
+            reviewStats.textContent = `Respondendo ${incorrectQuestions.length} pergunta(s) que você errou.`;
+            
+            // Mostrar contêiner de revisão e ocultar resultados
+            reviewContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            // Carregar primeira pergunta de revisão
+            loadReviewQuestion(currentReviewQuestion);
+            
+            // Atualizar botões
+            updateReviewButtons();
+        }
+
+        // Mostrar resultados da revisão
+        function showReviewResults() {
+            reviewScore = calculateReviewScore();
+            const reviewPercentage = Math.round((reviewScore / incorrectQuestions.length) * 100);
+            const reviewIncorrectCount = incorrectQuestions.length - reviewScore;
+            
+            // Calcular melhoria (comparação com a primeira tentativa)
+            const originalScoreOnTheseQuestions = reviewScore; // Na primeira vez, todas estavam erradas
+            const improvement = reviewScore; // Quantas acertou agora que antes errou
+            
+            // Atualizar elementos de resultados da revisão
+            reviewScoreElement.textContent = `${reviewPercentage}%`;
+            reviewCorrectAnswersElement.textContent = reviewScore;
+            reviewTotalQuestionsElement.textContent = incorrectQuestions.length;
+            reviewScoreTextElement.textContent = `Na revisão, você acertou ${reviewScore} de ${incorrectQuestions.length} perguntas`;
+            reviewCorrectCountElement.textContent = reviewScore;
+            reviewIncorrectCountElement.textContent = reviewIncorrectCount;
+            reviewImprovementElement.textContent = `${improvement} perguntas`;
+            
+            // Texto sobre melhoria
+            let improvementText = "";
+            if (reviewPercentage >= 80) {
+                improvementText = "Ótima melhoria! Você aprendeu com seus erros anteriores.";
+            } else if (reviewPercentage >= 50) {
+                improvementText = "Boa melhoria! Continue estudando para fixar os conceitos.";
+            } else {
+                improvementText = "Recomenda-se estudar mais esses conceitos antes de tentar novamente.";
+            }
+            
+            improvementTextElement.textContent = improvementText;
+            
+            // Mostrar contêiner de resultados da revisão e ocultar revisão
+            reviewResultsContainer.style.display = 'block';
+            reviewContainer.style.display = 'none';
+            
+            // Marcar revisão como completada
+            reviewCompleted = true;
+            
+            // Recarregar a última pergunta para mostrar explicações
+            loadReviewQuestion(currentReviewQuestion);
+        }
+
+        // Voltar para resultados principais
+        function backToMainResults() {
+            reviewResultsContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+        }
+
+        // Reiniciar revisão
+        function restartReview() {
+            inReviewMode = true;
+            currentReviewQuestion = 0;
+            reviewAnswers = Array(incorrectQuestions.length).fill(null);
+            reviewCompleted = false;
+            
+            // Mostrar contêiner de revisão e ocultar resultados da revisão
+            reviewContainer.style.display = 'block';
+            reviewResultsContainer.style.display = 'none';
+            
+            // Carregar primeira pergunta de revisão
+            loadReviewQuestion(currentReviewQuestion);
+            
+            // Atualizar botões
+            updateReviewButtons();
+        }
+
+        // Reiniciar quiz completo
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            score = 0;
+            quizCompleted = false;
+            incorrectQuestions = [];
+            inReviewMode = false;
+            currentReviewQuestion = 0;
+            reviewAnswers = [];
+            reviewScore = 0;
+            reviewCompleted = false;
+            
+            // Restaurar visibilidade dos elementos
+            resultsContainer.style.display = 'none';
+            reviewContainer.style.display = 'none';
+            reviewResultsContainer.style.display = 'none';
+            questionContainer.style.display = 'block';
+            document.getElementById('main-progress-container').style.display = 'flex';
+            document.getElementById('main-buttons-container').style.display = 'flex';
+            
+            // Reiniciar interface
+            initQuiz();
+        }
+
+        // Event listeners principais
+        prevBtn.addEventListener('click', prevQuestion);
+        nextBtn.addEventListener('click', nextQuestion);
+        submitBtn.addEventListener('click', showResults);
+        restartBtn.addEventListener('click', restartQuiz);
+        restartBtn2.addEventListener('click', restartQuiz);
+        startReviewBtn.addEventListener('click', startReviewMode);
+
+        // Event listeners da revisão
+        reviewPrevBtn.addEventListener('click', prevReviewQuestion);
+        reviewNextBtn.addEventListener('click', nextReviewQuestion);
+        submitReviewBtn.addEventListener('click', showReviewResults);
+
+        // Event listeners dos resultados da revisão
+        backToMainResultsBtn.addEventListener('click', backToMainResults);
+        restartReviewBtn.addEventListener('click', restartReview);
+        restartFullQuizBtn.addEventListener('click', restartQuiz);
+
+        // Navegação por teclado
+        document.addEventListener('keydown', function(e) {
+            if (inReviewMode && !reviewCompleted) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    // Seta direita ou espaço para próxima pergunta
+                    if (currentReviewQuestion < incorrectQuestions.length - 1) {
+                        nextReviewQuestion();
+                    }
+                } else if (e.key === 'ArrowLeft') {
+                    // Seta esquerda para pergunta anterior
+                    if (currentReviewQuestion > 0) {
+                        prevReviewQuestion();
+                    }
+                }
+            }
+        });
+
+        // Inicializar
+        initQuiz();
     </script>
 </body>
 </html>
